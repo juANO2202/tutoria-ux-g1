@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Gestión de tutorías universitarias: consultar, reservar, modificar y cancelar.">
+  <title>Tutoría UX</title>
+  <link rel="stylesheet" href="styles/base.css">
+</head>
+<body>
+  <a class="saltar" href="#contenido" onclick="event.preventDefault();document.getElementById('contenido').focus()">Saltar al contenido</a>
+  <header class="cabecera">
+    <a class="marca" href="#/inicio">Tutoría UX</a>
+    <nav aria-label="Principal">
+      <ul>
+        <li><a href="#/inicio">Inicio</a></li>
+        <li><a href="#/docentes">Docentes</a></li>
+        <li><a href="#/reservar/1">Reservar</a></li>
+        <li><a href="#/reservas">Mis reservas</a></li>
+      </ul>
+    </nav>
+  </header>
+  <main id="contenido" tabindex="-1">
+    <noscript>Esta aplicación necesita JavaScript.</noscript>
+  </main>
+  <footer>
+    <p>Proyecto académico con datos ficticios. Las reservas se guardan solo en este navegador.</p>
+    <button type="button" id="restablecer" class="enlace">Restablecer datos de demostración</button>
+  </footer>
+  <script type="module" src="../main.js"></script>
+</body>
+</html>
