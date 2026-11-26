@@ -5,6 +5,17 @@ import { vistaAsistente } from './views/asistente.js';
 import { vistaConfirmacion } from './views/confirmacion.js';
 import { vistaMisReservas } from './views/mis-reservas.js';
 
+const tituloDe = (ruta, paso, encabezado) =>
+  (ruta === 'reservar' ? `${encabezado}, paso ${Number(paso) || 1} de 4` : encabezado);
+
+/** Tras cambiar de pantalla, lleva el foco al encabezado nuevo (corrige H-03). */
+function enfocarEncabezado(principal) {
+  if (principal.contains(document.activeElement) && document.activeElement !== principal) return;
+  const encabezado = principal.querySelector('form h2') ?? principal.querySelector('h1');
+  encabezado?.setAttribute('tabindex', '-1');
+  encabezado?.focus({ preventScroll: true });
+}
+
 export function iniciarAplicacion({ reservas, borrador, restablecer }) {
   const principal = document.getElementById('contenido');
   const estado = { errores: null, mensaje: null, enfocarErrores: false };
@@ -37,6 +48,8 @@ export function iniciarAplicacion({ reservas, borrador, restablecer }) {
     };
     const nodos = (vistas[ruta] ?? vistas.inicio)();
     principal.replaceChildren(...nodos.filter(Boolean));
+    const encabezado = principal.querySelector('h1');
+    if (encabezado) document.title = `${tituloDe(ruta, parametro, encabezado.textContent)} · Tutoría UX`;
     if (estado.enfocarErrores) {
       const resumen = principal.querySelector('[data-resumen-errores]');
       if (resumen) {
@@ -58,8 +71,9 @@ export function iniciarAplicacion({ reservas, borrador, restablecer }) {
   });
 
   window.addEventListener('hashchange', () => {
-    pintar();
     window.scrollTo(0, 0);
+    pintar();
+    enfocarEncabezado(principal);
   });
   pintar();
 }
