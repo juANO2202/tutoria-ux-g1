@@ -35,6 +35,17 @@
 | Elemento con foco tras «Continuar» | `BODY` | Encabezado «Paso 2 de 4» |
 | Título del documento en el paso 2 | «Tutoría UX» | «Reservar tutoría, paso 2 de 4 · Tutoría UX» |
 
+## Comprobaciones automáticas adicionales (ejecutadas)
+
+`tests/e2e/teclado.e2e.mjs`, en Chrome o Edge sin interfaz, sobre la v2. Son resultados reales de una ejecución automática, no una verificación manual.
+
+| Comprobación | Resultado | Límite |
+|---|---|---|
+| Reservar y cancelar enviando solo eventos de teclado | Pasa | No juzga si el orden o el foco resultan comprensibles; no incluye modificar |
+| Reflujo en 683 px CSS (equivalente a 200 % en 1366×768) | Pasa en 4 pantallas | Emulación del ancho; no es el zoom usado a mano |
+| Reflujo en 360×800 | Pasa en 4 pantallas | Ventana emulada; no es un teléfono ni prueba el uso táctil |
+| Lector de pantalla | **No ejecutado** | |
+
 ## Verificación manual del equipo (completar)
 
 | Prueba | Pasos | Resultado | Quién y fecha |
