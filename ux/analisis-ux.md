@@ -63,6 +63,8 @@ Escala: −2 frustración · −1 molestia · 0 neutral · +1 satisfacción · +
 
 ## Cómo se validan las hipótesis
 
+Hay un [contraste **simulado**](../evaluacion/simulacion/validacion-curva-simulada.md); no valida las hipótesis.
+
 En cada sesión se registra el **SEQ** (1–7) al terminar cada tarea y las citas del participante. T1 cubre TP1–TP4; T2 y T3 cubren TP4–TP5. Después de P01 y P02 se anota aquí, sin borrar la hipótesis:
 
 | Hipótesis | ¿Se observó? (sí / no / no concluyente) | Evidencia (participante, tarea, observación) |

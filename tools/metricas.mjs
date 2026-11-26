@@ -5,6 +5,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 export const TAREAS = ['T1', 'T2', 'T3'];
 const PARTICIPANTES = ['P01', 'P02']; // P00 es el pilotaje y no entra en las métricas.
+const SIMULADOS = ['S01', 'S02'];
 const EXITOS = ['si', 'parcial', 'no'];
 
 export function leerCSV(texto) {
@@ -48,9 +49,9 @@ export function puntajeSUS(respuestas) {
 
 const promedio = (lista) => lista.reduce((s, x) => s + x, 0) / lista.length;
 
-export function calcular(sesiones, sus) {
-  const reales = sesiones.filter((f) => PARTICIPANTES.includes(f.participante));
-  const faltan = PARTICIPANTES.flatMap((p) => TAREAS
+export function calcular(sesiones, sus, participantes = PARTICIPANTES) {
+  const reales = sesiones.filter((f) => participantes.includes(f.participante));
+  const faltan = participantes.flatMap((p) => TAREAS
     .filter((t) => reales.filter((f) => f.participante === p && f.tarea === t && f.version === 'v1').length !== 1)
     .map((t) => `${p}-${t}`));
   const filas = reales.map((f) => {
@@ -77,7 +78,7 @@ export function calcular(sesiones, sus) {
       seq: promedio(g.map((f) => f.seq)),
     };
   }).filter(Boolean));
-  const puntajes = sus.filter((f) => PARTICIPANTES.includes(f.participante)).map((f) => ({
+  const puntajes = sus.filter((f) => participantes.includes(f.participante)).map((f) => ({
     participante: f.participante,
     version: f.version,
     sus: puntajeSUS(Array.from({ length: 10 }, (_, i) => f[`q${i + 1}`])),
@@ -114,13 +115,28 @@ Con dos participantes estas cifras describen lo observado; no permiten generaliz
 `;
 }
 
+/** Rotula el informe para que ninguna tabla pueda leerse como resultado real. */
+export function informeSimulado(datos) {
+  const aviso = '> ⚠️ **DATOS SIMULADOS.** No hubo participantes. Estas cifras son ficticias y no son evidencia de usabilidad.';
+  return informe(datos)
+    .replace('# Métricas de las pruebas con usuarios', '# Métricas SIMULADAS')
+    .replace(/> Archivo generado[^\n]*/, aviso)
+    .replace(/^## (.+)$/gm, '## $1 (SIMULADO)')
+    .replace(/Con dos participantes[^\n]*/, 'Datos simulados: no describen el comportamiento de nadie ni permiten afirmar mejoras.');
+}
+
 if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
-  const ruta = (n) => fileURLToPath(new URL(`../evaluacion/resultados/${n}`, import.meta.url));
+  const simulacion = process.argv.includes('--simulacion');
+  const carpeta = simulacion ? 'simulacion' : 'resultados';
+  const [sesionesCSV, susCSV, salida] = simulacion
+    ? ['sesiones-simuladas.csv', 'sus-simulado.csv', 'metricas-simuladas.md']
+    : ['sesiones.csv', 'sus.csv', 'metricas.md'];
+  const ruta = (n) => fileURLToPath(new URL(`../evaluacion/${carpeta}/${n}`, import.meta.url));
   try {
-    const datos = calcular(leerCSV(readFileSync(ruta('sesiones.csv'), 'utf8')),
-      leerCSV(readFileSync(ruta('sus.csv'), 'utf8')));
-    writeFileSync(ruta('metricas.md'), informe(datos));
-    console.log(`metricas.md actualizado (${datos.filas.length} filas de P01/P02).`);
+    const datos = calcular(leerCSV(readFileSync(ruta(sesionesCSV), 'utf8')),
+      leerCSV(readFileSync(ruta(susCSV), 'utf8')), simulacion ? SIMULADOS : PARTICIPANTES);
+    writeFileSync(ruta(salida), simulacion ? informeSimulado(datos) : informe(datos));
+    console.log(`${salida} actualizado (${datos.filas.length} filas).`);
     if (datos.faltan.length) console.log(`Faltan en v1: ${datos.faltan.join(', ')}`);
   } catch (error) {
     console.error(`No se generaron métricas: ${error.message}`);

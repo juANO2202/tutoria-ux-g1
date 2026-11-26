@@ -70,6 +70,8 @@ Severidad 3: H-01, H-03 y H-04. Los dos prioritarios son **H-01** (afecta a la r
 
 ## Hallazgos de las sesiones con usuarios (P01, P02)
 
+Existe un [escenario **simulado**](simulacion/hallazgos-simulados.md), separado de esta tabla porque no procede de usuarios.
+
 **PENDIENTE.** No agregar nada que no se haya observado. Si un hallazgo de usuario coincide con uno anterior, anotar la evidencia debajo de él.
 
 | ID | Participante y tarea | Qué ocurrió (hecho observado o cita) | Severidad 0–4 | Recomendación | Estado |
