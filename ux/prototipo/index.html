@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prototipo navegable · Tutoría UX</title>
+<style>
+  body{font-family:system-ui,sans-serif;margin:0;background:#ddd;color:#111;line-height:1.45}
+  .marco{max-width:25rem;margin:0 auto;background:#fff;min-height:100vh;padding:1rem;box-sizing:border-box}
+  button,select,textarea{font:inherit;min-height:44px;padding:.4rem .8rem;border:2px solid #555;border-radius:.4rem;background:#fff;color:#111}
+  select,textarea{width:100%;box-sizing:border-box}
+  button.p{background:#333;color:#fff}
+  :focus-visible{outline:3px solid #b45309;outline-offset:2px}
+  .caja{border:2px dashed #777;border-radius:.4rem;padding:.7rem;margin:.7rem 0}
+  .error{border:3px solid #900;color:#700}
+  .ok{border:3px double #060}
+  .fila{display:flex;gap:.5rem;flex-wrap:wrap;margin:.6rem 0}
+  .sim{background:#fff8d6;border:1px solid #a80;padding:.5rem;font-size:.85rem}
+  label{display:block;font-weight:600;margin-top:.6rem}
+  [aria-pressed=true]{background:#333;color:#fff}
+</style>
+</head>
+<body>
+<div class="marco">
+  <p class="sim"><strong>Prototipo de baja fidelidad.</strong> Controles de simulación:
+    <label><input type="checkbox" id="sim-ocupado"> El horario se ocupa al confirmar</label>
+    <label><input type="checkbox" id="sim-red"> Falla el guardado</label>
+  </p>
+  <main id="app" tabindex="-1"></main>
+</div>
+<script>
+// Estado único: las selecciones sobreviven a cualquier navegación o error.
+const S = { materia: '', docente: '', modalidad: '', horario: '', motivo: '', reserva: null, editando: false };
+const DOCENTES = { 'Bases de Datos': 'Docente B', 'Interacción Humano-Computador': 'Docente A' };
+const HORARIOS = ['Lun 09:00', 'Mar 10:00', 'Jue 16:00'];
+const app = document.getElementById('app');
+let pantalla = 'inicio', error = '';
+
+const esc = (t) => t.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const boton = (texto, destino, principal) => `<button type="button" class="${principal ? 'p' : ''}" data-ir="${destino}">${texto}</button>`;
+const opcion = (campo, valor, texto = valor, des = false) => `<button type="button" id="o-${campo}-${valor.replace(/\W/g, '')}" data-campo="${campo}" data-valor="${valor}" aria-pressed="${S[campo] === valor}" ${des ? 'disabled' : ''}>${texto}</button>`;
+const resumen = (r) => `<div class="caja"><p>${r.materia} · ${r.docente}<br>${r.modalidad} · ${r.horario}<br>Motivo: ${esc(r.motivo)}</p></div>`;
+
+const VISTAS = {
+  inicio: () => `<h1>Inicio</h1><div class="fila">${boton('Reservar', 'materia', true)}${boton('Mis reservas', 'reservas')}</div>`,
+  materia: () => `<h1>1. Materia y docente</h1>
+    <label for="materia">Materia</label><select id="materia" data-select="materia"><option value="">Seleccione</option>
+    ${Object.keys(DOCENTES).map((m) => `<option ${S.materia === m ? 'selected' : ''}>${m}</option>`).join('')}</select>
+    <p>Docente: ${S.docente || '—'}</p><div class="fila">${boton('Inicio', 'inicio')}${boton('Continuar', 'horario', true)}</div>`,
+  horario: () => `<h1>2. Modalidad y horario</h1>
+    <h2>Modalidad</h2><div class="fila">${opcion('modalidad', 'Presencial')}${opcion('modalidad', 'Virtual')}</div>
+    <h2>Horario</h2><div class="fila">${HORARIOS.map((x, i) => opcion('horario', x, i ? x : `${x} (ocupado)`, !i)).join('')}</div>
+    <div class="fila">${boton('Atrás', 'materia')}${boton('Continuar', 'motivo', true)}</div>`,
+  motivo: () => `<h1>3. Motivo</h1><label for="motivo">Motivo (mínimo 10 caracteres)</label>
+    <textarea id="motivo" rows="4">${esc(S.motivo)}</textarea><div class="fila">${boton('Atrás', 'horario')}${boton('Continuar', 'revision', true)}</div>`,
+  revision: () => `<h1>4. Revisar</h1>${resumen(S)}
+    <div class="fila">${boton('Atrás', 'motivo')}<button type="button" class="p" id="confirmar">${S.editando ? 'Guardar cambios' : 'Confirmar'}</button></div>`,
+  confirmacion: () => `<h1>${S.reserva.estado === 'Modificada' ? 'Cambios guardados' : 'Reserva confirmada'}</h1>
+    <div class="caja ok">Código TUT-1001</div>${resumen(S.reserva)}<div class="fila">${boton('Mis reservas', 'reservas', true)}</div>`,
+  reservas: () => `<h1>Mis reservas</h1>${S.reserva ? `<h2>TUT-1001 · ${S.reserva.estado}</h2>${resumen(S.reserva)}
+    ${S.reserva.estado !== 'Cancelada' ? `<div class="fila"><button type="button" id="modificar">Modificar</button>${boton('Cancelar reserva', 'cancelar')}</div>` : ''}` : '<div class="caja">Todavía no tiene reservas.</div>'}
+    <div class="fila">${boton('Inicio', 'inicio')}${boton('Nueva reserva', 'materia')}</div>`,
+  cancelar: () => `<h1>¿Cancelar la reserva TUT-1001?</h1>${resumen(S.reserva)}<p>Esta acción no se puede deshacer.</p>
+    <div class="fila">${boton('Conservar reserva', 'reservas', true)}<button type="button" id="cancelar-si">Sí, cancelar</button></div>`,
+};
+
+function validar(destino) {
+  const orden = ['materia', 'horario', 'motivo', 'revision'];
+  const n = orden.indexOf(destino);
+  if (n > 0 && !S.materia) return ['materia', 'Seleccione una materia.'];
+  if (n > 1 && (!S.modalidad || !S.horario)) return ['horario', 'Elija modalidad y horario.'];
+  if (n > 2 && S.motivo.trim().length < 10) return ['motivo', 'Describa el motivo con al menos 10 caracteres.'];
+  return null;
+}
+
+function pintar(moverFoco) {
+  const foco = document.activeElement && document.activeElement.id;
+  app.innerHTML = (error ? `<div class="caja error" role="alert" tabindex="-1">${error}</div>` : '') + VISTAS[pantalla]();
+  if (moverFoco) (app.querySelector('[role=alert]') || app).focus();
+  else if (foco && document.getElementById(foco)) document.getElementById(foco).focus();
+}
+function ir(destino) {
+  const fallo = validar(destino);
+  [pantalla, error] = fallo || [destino, ''];
+  pintar(true);
+}
+
+app.addEventListener('click', (e) => {
+  const b = e.target.closest('button');
+  if (!b) return;
+  if (b.dataset.ir) {
+    if (b.textContent === 'Nueva reserva' && S.editando) Object.assign(S, { materia: '', docente: '', modalidad: '', horario: '', motivo: '', editando: false });
+    ir(b.dataset.ir);
+  } else if (b.dataset.campo) { S[b.dataset.campo] = b.dataset.valor; error = ''; pintar(); } else if (b.id === 'modificar') {
+    Object.assign(S, S.reserva, { reserva: S.reserva, editando: true });
+    ir('revision');
+  } else if (b.id === 'cancelar-si') { S.reserva.estado = 'Cancelada'; ir('reservas'); } else if (b.id === 'confirmar') {
+    const ocupado = document.getElementById('sim-ocupado');
+    const red = document.getElementById('sim-red');
+    if (ocupado.checked) { ocupado.checked = false; S.horario = ''; pantalla = 'horario'; error = 'Ese horario acaba de ser ocupado. Elija otro; sus demás datos se conservan.'; pintar(true); return; }
+    if (red.checked) { red.checked = false; error = 'No se pudo guardar. Sus datos siguen aquí: vuelva a confirmar.'; pintar(true); return; }
+    const { materia, docente, modalidad, horario, motivo } = S;
+    S.reserva = { materia, docente, modalidad, horario, motivo, estado: S.editando ? 'Modificada' : 'Confirmada' };
+    Object.assign(S, { materia: '', docente: '', modalidad: '', horario: '', motivo: '', editando: false });
+    ir('confirmacion');
+  }
+});
+app.addEventListener('change', (e) => {
+  if (e.target.dataset.select) { S.materia = e.target.value; S.docente = DOCENTES[S.materia] || ''; error = ''; pintar(); }
+});
+app.addEventListener('input', (e) => { if (e.target.id === 'motivo') S.motivo = e.target.value; });
+pintar();
+</script>
+</body>
+</html>
