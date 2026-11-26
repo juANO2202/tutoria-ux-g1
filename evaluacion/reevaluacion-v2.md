@@ -21,6 +21,8 @@ Una prueba automática demuestra que el comportamiento cambió. **No demuestra q
 
 ## 2. Reevaluación con usuarios (PENDIENTE)
 
+No se realizó con personas. Ver el [escenario **simulado**](simulacion/reevaluacion-simulada.md).
+
 Repetir en v2 al menos las tareas relacionadas con los hallazgos: provocar un error de validación en T1 y completar T3. Registrar las filas con `version = v2`.
 
 Lo ideal es usar participantes nuevos. Si repiten P01 o P02, anotar que hay **efecto de aprendizaje** y no atribuir mejoras de tiempo a la v2.

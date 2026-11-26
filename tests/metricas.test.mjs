@@ -1,7 +1,7 @@
 // Verifica el cálculo de métricas con datos de ejemplo que viven solo dentro de esta prueba.
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { calcular, informe, leerCSV, puntajeSUS } from '../tools/metricas.mjs';
+import { calcular, informe, informeSimulado, leerCSV, puntajeSUS } from '../tools/metricas.mjs';
 
 describe('Herramienta de métricas', () => {
   it('calcula SUS en sus extremos y en el punto medio', () => {
@@ -26,6 +26,16 @@ describe('Herramienta de métricas', () => {
     assert.equal(r.filas.length, 1);
     assert.equal(r.faltan.length, 5);
     assert.match(informe(r), /INCOMPLETO/);
+  });
+
+  it('el informe simulado queda rotulado y no mezcla códigos reales', () => {
+    const fila = (participante) => ({
+      participante, version: 'v1', tarea: 'T1', tiempo_s: '10', exito: 'si', errores: '0', ayudas: '0', seq: '7',
+    });
+    const datos = calcular([fila('S01'), fila('P01')], [], ['S01', 'S02']);
+    assert.deepEqual(datos.filas.map((f) => f.participante), ['S01']);
+    assert.match(informeSimulado(datos), /Métricas SIMULADAS[\s\S]*DATOS SIMULADOS[\s\S]*Resumen por tarea \(SIMULADO\)/);
+    assert.equal(calcular([fila('S01')], []).filas.length, 0);
   });
 
   it('rechaza valores vacíos o fuera de rango', () => {
