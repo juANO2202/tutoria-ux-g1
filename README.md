@@ -11,10 +11,12 @@ Interacción Humano-Computador · Grupo 1 · 2026. Aplicación web para consulta
 | Prototipo navegable | Hecho | [ux/prototipo/](ux/prototipo/) |
 | Implementación y pruebas funcionales | Hecho | [src/](src/), [tests/](tests/) |
 | Heurísticas, recorrido cognitivo y WCAG | Inspección asistida por IA; **verificación del equipo pendiente** | [evaluacion/](evaluacion/) |
-| Pilotaje P00 | **Pendiente** | [evaluacion/piloto-P00.md](evaluacion/piloto-P00.md) |
-| Sesiones P01 y P02 y métricas | **Pendiente** | [evaluacion/resultados/](evaluacion/resultados/) |
+| Pilotaje P00 | **No realizado con personas**; solo [simulación](evaluacion/simulacion/piloto-S00.md) | [evaluacion/piloto-P00.md](evaluacion/piloto-P00.md) |
+| Sesiones P01 y P02 y métricas | **No realizadas**; solo [simulación](evaluacion/simulacion/metricas-simuladas.md) | [evaluacion/resultados/](evaluacion/resultados/) |
 | Corrección de dos problemas prioritarios | Hecho (H-01, H-04 y además H-03) | [evaluacion/hallazgos.md](evaluacion/hallazgos.md) |
-| Reevaluación v2 | Técnica hecha; **con usuarios pendiente** | [evaluacion/reevaluacion-v2.md](evaluacion/reevaluacion-v2.md) |
+| Reevaluación v2 | Técnica hecha; **con usuarios no realizada**; solo [simulación](evaluacion/simulacion/reevaluacion-simulada.md) | [evaluacion/reevaluacion-v2.md](evaluacion/reevaluacion-v2.md) |
+
+> ⚠️ Los datos de [evaluacion/simulacion/](evaluacion/simulacion/) son **ficticios**. No hubo pruebas con usuarios.
 
 ## Instalación
 
@@ -56,7 +58,7 @@ La primera cubre los casos de uso (R1–R6), el borrador y el cálculo de métri
 npm run metricas
 ```
 
-Genera `evaluacion/resultados/metricas.md` solo a partir de las sesiones registradas.
+Genera `evaluacion/resultados/metricas.md` solo a partir de las sesiones registradas. `npm run metricas:simulacion` calcula las del escenario simulado y `npm run contribuciones` genera `COMMITS.md` con los hashes del historial.
 
 ## Funcionalidades
 
@@ -102,4 +104,4 @@ Diagrama y decisiones en [docs/arquitectura.md](docs/arquitectura.md).
 
 ## Uso de asistencia de IA
 
-El código, las pruebas, los diagramas, la documentación base, las mediciones automáticas y la inspección inicial (heurísticas, recorrido cognitivo y accesibilidad) se produjeron con asistencia de **Claude (Anthropic)**. Cada integrante sube, revisa y debe poder defender las partes que figuran a su nombre en [CONTRIBUCIONES.md](CONTRIBUCIONES.md). El pilotaje, las sesiones con usuarios y sus resultados los realiza y registra el equipo; ninguno es simulado.
+El código, las pruebas, los diagramas, la documentación base, las mediciones automáticas y la inspección inicial (heurísticas, recorrido cognitivo y accesibilidad) se produjeron con asistencia de **Claude (Anthropic)**. Cada integrante sube, revisa y debe poder defender las partes que figuran a su nombre en [CONTRIBUCIONES.md](CONTRIBUCIONES.md). El pilotaje, las sesiones con usuarios y sus resultados los realiza y registra el equipo; los datos ficticios están únicamente en `evaluacion/simulacion/`, rotulados como simulación.
