@@ -7,7 +7,7 @@ import { vistaMisReservas } from './views/mis-reservas.js';
 
 export function iniciarAplicacion({ reservas, borrador, restablecer }) {
   const principal = document.getElementById('contenido');
-  const estado = { errores: null, mensaje: null };
+  const estado = { errores: null, mensaje: null, enfocarErrores: false };
 
   const contexto = {
     reservas,
@@ -20,8 +20,9 @@ export function iniciarAplicacion({ reservas, borrador, restablecer }) {
     refrescar() {
       // Conserva el foco del control que provocó el repintado (necesario con teclado).
       const foco = document.activeElement?.id;
+      const hayErroresNuevos = estado.enfocarErrores;
       pintar();
-      if (foco) document.getElementById(foco)?.focus();
+      if (!hayErroresNuevos && foco) document.getElementById(foco)?.focus();
     },
   };
 
@@ -36,6 +37,13 @@ export function iniciarAplicacion({ reservas, borrador, restablecer }) {
     };
     const nodos = (vistas[ruta] ?? vistas.inicio)();
     principal.replaceChildren(...nodos.filter(Boolean));
+    if (estado.enfocarErrores) {
+      const resumen = principal.querySelector('[data-resumen-errores]');
+      if (resumen) {
+        resumen.focus();
+        estado.enfocarErrores = false;
+      }
+    }
     document.querySelectorAll('nav a').forEach((a) => {
       if (a.hash.split('/')[1] === ruta) a.setAttribute('aria-current', 'page');
       else a.removeAttribute('aria-current');

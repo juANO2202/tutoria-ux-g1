@@ -80,6 +80,13 @@ textarea::placeholder { color: var(--pista); }
 .aviso-exito { border-color: var(--exito); background: var(--exito-fondo); color: var(--exito); }
 .aviso-info { border-color: var(--primario); background: var(--info-fondo); }
 
+.aviso h3 { font-size: 1rem; margin: 0 0 .3rem; }
+.aviso ul { margin: 0; padding-left: 1.2rem; }
+.aviso li a { color: inherit; display: inline-block; min-height: 24px; }
+.con-error select, .con-error textarea { border: 2px solid var(--error); }
+.con-error .opcion input:not(:disabled) + label { border-color: var(--error); }
+.mensaje-error { color: var(--error); font-weight: 600; margin: .35rem 0 0; }
+
 .resumen { display: grid; grid-template-columns: minmax(0, 1fr); margin: 0; }
 .resumen dt { font-size: .85rem; color: var(--suave); }
 .resumen dd { margin: 0 0 .5rem; overflow-wrap: anywhere; }
