@@ -2,9 +2,9 @@
 
 | Orden | ID | Mejora | Sev. | Esfuerzo | Estado |
 |---|---|---|---|---|---|
-| 1 | H-01 | Errores enlazados y asociados a campos | 3 | Medio | Pendiente |
-| 2 | H-04 | Confirmación de cancelación con contexto | 3 | Bajo | Pendiente |
-| 3 | H-03 | Foco y título al navegar | 3 | Bajo | Pendiente |
+| 1 | H-01 | Errores enlazados y asociados a campos | 3 | Medio | Hecho (v2) |
+| 2 | H-04 | Confirmación de cancelación con contexto | 3 | Bajo | Hecho (v2) |
+| 3 | H-03 | Foco y título al navegar | 3 | Bajo | Hecho (v2) |
 | 4 | H-02 | Editar desde la revisión | 2 | Medio | Pendiente |
 | 5 | H-06 | Borradores separados para crear y modificar | 2 | Medio | Pendiente |
 | 6 | H-05 | Avisar que se reinició el horario | 2 | Bajo | Pendiente |
