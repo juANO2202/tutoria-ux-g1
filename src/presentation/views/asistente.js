@@ -2,6 +2,7 @@
 import { h } from '../components/dom.js';
 import { aviso, grupoOpciones, indicadorPasos, resumenReserva, PASOS } from '../components/ui.js';
 import { fechaCorta } from '../components/formato.js';
+import { marcarErrores, resumenErrores } from '../components/errores.js';
 import { MODALIDADES } from '../../domain/disponibilidad.js';
 import { MOTIVO_MAX, MOTIVO_MIN } from '../../domain/reserva.js';
 
@@ -31,6 +32,7 @@ export function vistaAsistente({ reservas, borrador, ir, refrescar, estado }, pa
     const fallos = reservas.validarPaso(borrador.leer(), paso);
     if (Object.keys(fallos).length) {
       estado.errores = fallos;
+      estado.enfocarErrores = true;
       refrescar();
       return;
     }
@@ -54,6 +56,7 @@ export function vistaAsistente({ reservas, borrador, ir, refrescar, estado }, pa
         ir(`#/confirmacion/${guardada.id}`);
       } catch (error) {
         estado.errores = error.campos ?? { general: error.message };
+        estado.enfocarErrores = true;
         if (error.campos?.hora) {
           borrador.actualizar({ hora: '' });
           ir('#/reservar/2');
@@ -148,7 +151,11 @@ export function vistaAsistente({ reservas, borrador, ir, refrescar, estado }, pa
 
   const contenido = { 1: paso1, 2: paso2, 3: paso3, 4: paso4 }[paso]();
   const final = datos.editandoId ? 'Guardar cambios' : 'Confirmar reserva';
-  const mensajes = Object.values(errores);
+
+  const conErrores = (formulario) => {
+    marcarErrores(formulario, errores);
+    return formulario;
+  };
 
   return [
     h('h1', {}, datos.editandoId ? 'Modificar reserva' : 'Reservar tutoría'),
@@ -159,15 +166,15 @@ export function vistaAsistente({ reservas, borrador, ir, refrescar, estado }, pa
         type: 'button', class: 'enlace',
         onClick: () => { borrador.limpiar(); ir('#/reservas'); },
       }, 'Descartar cambios')) : null,
-    h('form', { class: 'tarjeta', novalidate: true, onSubmit: paso === 4 ? confirmar : avanzar },
+    conErrores(h('form', { class: 'tarjeta', novalidate: true, onSubmit: paso === 4 ? confirmar : avanzar },
       h('h2', {}, `Paso ${paso} de 4: ${PASOS[paso - 1]}`),
-      mensajes.length ? aviso('error', mensajes.join(' ')) : null,
+      resumenErrores(errores),
       contenido,
       h('div', { class: 'acciones' },
         paso > 1 ? h('button', {
           type: 'button', class: 'boton secundario',
           onClick: () => { estado.errores = null; ir(`#/reservar/${paso - 1}`); },
         }, 'Atrás') : null,
-        h('button', { type: 'submit', class: 'boton' }, paso === 4 ? final : 'Continuar'))),
+        h('button', { type: 'submit', class: 'boton' }, paso === 4 ? final : 'Continuar')))),
   ];
 }

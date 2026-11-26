@@ -1,5 +1,7 @@
 import { h } from '../components/dom.js';
 import { aviso, insigniaEstado, resumenReserva } from '../components/ui.js';
+import { pedirConfirmacion } from '../components/dialogo.js';
+import { fechaLarga } from '../components/formato.js';
 
 export function vistaMisReservas({ reservas, borrador, ir, refrescar, estado }) {
   const lista = reservas.listar();
@@ -12,8 +14,17 @@ export function vistaMisReservas({ reservas, borrador, ir, refrescar, estado }) 
     ir('#/reservar/1');
   }
 
-  function cancelar(r) {
-    if (!window.confirm('¿Está seguro?')) return;
+  async function cancelar(r) {
+    const confirmado = await pedirConfirmacion({
+      titulo: `¿Cancelar la reserva ${r.codigo}?`,
+      parrafos: [
+        `${r.asignatura.nombre} con ${r.docente.nombre}, ${fechaLarga(r.fecha)} a las ${r.hora}.`,
+        'El horario quedará libre para otras personas. Esta acción no se puede deshacer.',
+      ],
+      aceptar: 'Sí, cancelar reserva',
+      rechazar: 'Conservar reserva',
+    });
+    if (!confirmado) return;
     try {
       reservas.cancelar(r.id);
       if (borrador.leer().editandoId === r.id) borrador.limpiar();
@@ -22,6 +33,8 @@ export function vistaMisReservas({ reservas, borrador, ir, refrescar, estado }) 
       estado.mensaje = { tipo: 'error', texto: error.message };
     }
     refrescar();
+    // El botón pulsado desaparece: el foco pasa al mensaje de resultado.
+    document.querySelector('main .aviso')?.focus();
   }
 
   return [

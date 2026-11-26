@@ -18,7 +18,9 @@ export const insigniaEstado = (estado) =>
   h('span', { class: `insignia insignia-${estado}` }, ESTADOS[estado]);
 
 export const aviso = (tipo, ...contenido) =>
-  h('div', { class: `aviso aviso-${tipo}`, role: tipo === 'error' ? 'alert' : 'status' }, ...contenido);
+  h('div', {
+    class: `aviso aviso-${tipo}`, role: tipo === 'error' ? 'alert' : 'status', tabindex: '-1',
+  }, ...contenido);
 
 /** Grupo de opciones de selección única, operable con teclado (radios nativos). */
 export function grupoOpciones({ nombre, leyenda, opciones, valor, alElegir }) {
