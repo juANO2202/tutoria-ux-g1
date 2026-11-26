@@ -1,0 +1,14 @@
+{
+  "name": "tutoria-ux-g1",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Gestión de tutorías universitarias · HCI 2026 · Grupo 1",
+  "type": "module",
+  "scripts": {
+    "start": "node tools/serve.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "test:e2e": "node --test tests/e2e/*.e2e.mjs",
+    "metricas": "node tools/metricas.mjs"
+  },
+  "engines": { "node": ">=22" }
+}
