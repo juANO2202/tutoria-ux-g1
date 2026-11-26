@@ -1,0 +1,59 @@
+{
+  "errorPaso1": {
+    "alerta": "Revise estos 2 problemasSeleccione una asignatura.Seleccione un docente.",
+    "invalidos": 2,
+    "describedby": [
+      "error-asignaturaId",
+      "error-docenteId"
+    ],
+    "enlacesEnAlerta": 2
+  },
+  "focoTrasError": "DIV «Revise estos 2 problemasSeleccione una a»",
+  "focoTrasAvanzar": "H2 «Paso 2 de 4: Modalidad y horario»",
+  "tituloDocumento": "Reservar tutoría, paso 2 de 4 · Tutoría UX",
+  "revision": {
+    "botones": [
+      "Atrás",
+      "Confirmar reserva"
+    ]
+  },
+  "focoTrasFalloGuardado": "DIV «Revise este problemaNo se pudo guardar. »",
+  "mensajeCancelar": null,
+  "dialogoPropio": true,
+  "medidas": {
+    "texto_fondo": 14.71,
+    "suave_fondo": 5.42,
+    "primario_blanco": 8.22,
+    "error_errorfondo": 6.89,
+    "exito_exitofondo": 6.74,
+    "placeholder_blanco": 3.06,
+    "borde_opcion_blanco": 1.6,
+    "foco_blanco": 5.02
+  },
+  "objetivosMenores24px": [
+    {
+      "t": "Ver mis reservas",
+      "h": 21,
+      "w": 113
+    }
+  ],
+  "reflowSobrantePx": {
+    "320 #/inicio": 0,
+    "320 #/docentes": 0,
+    "320 #/reservar/1": 0,
+    "320 #/reservas": 0,
+    "360 #/inicio": 0,
+    "360 #/docentes": 0,
+    "360 #/reservar/1": 0,
+    "360 #/reservas": 0,
+    "768 #/inicio": 0,
+    "768 #/docentes": 0,
+    "768 #/reservar/1": 0,
+    "768 #/reservas": 0,
+    "1366 #/inicio": 0,
+    "1366 #/docentes": 0,
+    "1366 #/reservar/1": 0,
+    "1366 #/reservas": 0
+  },
+  "erroresJS": []
+}

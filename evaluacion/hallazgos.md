@@ -8,7 +8,7 @@ Origen: **inspección** (heurísticas, recorrido cognitivo y WCAG) sobre la v1. 
 - **Evidencia:** [captura](../evidencias/antes/03-error-validacion-movil.png). `mediciones.json`: 0 campos con `aria-invalid`, `aria-describedby` nulo, 0 enlaces en la alerta y foco en `BODY`.
 - **Impacto:** quien usa lector de pantalla o teclado no sabe qué campo corregir; bloquea la recuperación en el flujo principal.
 - **Recomendación:** resumen enlazado que reciba el foco, mensaje junto a cada campo, `aria-invalid` y `aria-describedby`.
-- **Estado:** ⏳ por corregir (**prioritario 1**).
+- **Estado:** ✅ corregido en v2 (**prioritario 1**).
 
 ## H-02 · La revisión no permite editar directamente (severidad 2)
 
@@ -23,7 +23,7 @@ Origen: **inspección** (heurísticas, recorrido cognitivo y WCAG) sobre la v1. 
 - **Evidencia:** `mediciones.json`: `focoTrasAvanzar` es `BODY` y `tituloDocumento` es «Tutoría UX».
 - **Impacto:** con teclado hay que recorrer otra vez la cabecera en cada paso; un lector de pantalla no anuncia la pantalla nueva.
 - **Recomendación:** enfocar el encabezado y actualizar `document.title`.
-- **Estado:** ⏳ por corregir (corrección adicional).
+- **Estado:** ✅ corregido en v2 (corrección adicional).
 
 ## H-04 · La cancelación no identifica la reserva (severidad 3)
 
@@ -31,7 +31,7 @@ Origen: **inspección** (heurísticas, recorrido cognitivo y WCAG) sobre la v1. 
 - **Evidencia:** `mediciones.json`: `mensajeCancelar` = «¿Está seguro?» (diálogo nativo). La captura de [Mis reservas](../evidencias/antes/08-mis-reservas-movil.png) muestra la pantalla de origen; el diálogo nativo no aparece en capturas automáticas.
 - **Impacto:** puede cancelarse la reserva equivocada y la acción no se deshace.
 - **Recomendación:** diálogo con código, asignatura, docente, fecha y consecuencia; botones con verbos; foco inicial en la opción segura.
-- **Estado:** ⏳ por corregir (**prioritario 2**).
+- **Estado:** ✅ corregido en v2 (**prioritario 2**).
 
 ## H-05 · Cambiar de docente borra fecha y hora sin avisar (severidad 2)
 
@@ -64,7 +64,7 @@ Origen: **inspección** (heurísticas, recorrido cognitivo y WCAG) sobre la v1. 
 
 ## Criterio de priorización
 
-Severidad 3: H-01, H-03 y H-04. Los dos prioritarios son **H-01** (afecta a la recuperación en todos los pasos y falla un criterio de nivel A) y **H-04** (única acción irreversible). H-03 también se corregirá por ser de nivel A.
+Severidad 3: H-01, H-03 y H-04. Los dos prioritarios son **H-01** (afecta a la recuperación en todos los pasos y falla un criterio de nivel A) y **H-04** (única acción irreversible). H-03 también se corrigió por ser de nivel A.
 
 ---
 
