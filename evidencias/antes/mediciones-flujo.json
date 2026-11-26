@@ -1,0 +1,17 @@
+{
+  "clicsIrYVolverAPaso1": 6,
+  "hashFinal": "#/reservar/4",
+  "trasCambiarDocente": {
+    "texto": null,
+    "borrador": {
+      "asignaturaId": "hci",
+      "docenteId": "salas",
+      "modalidad": "presencial",
+      "fecha": "",
+      "hora": "",
+      "motivo": "Dudas sobre la matriz de trazabilidad",
+      "editandoId": null
+    }
+  },
+  "borradorNuevoTrasModificar": null
+}
