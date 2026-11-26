@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Registro de sesión de usabilidad</title>
+<style>
+  body{font-family:system-ui,sans-serif;max-width:46rem;margin:0 auto;padding:1rem;line-height:1.5}
+  fieldset{margin:0 0 1rem;border:1px solid #888;border-radius:.5rem}
+  label{display:block;margin:.4rem 0;font-weight:600}
+  input,select,textarea,button{font:inherit;min-height:40px;padding:.3rem .6rem}
+  textarea{width:100%;box-sizing:border-box}
+  .reloj{font-size:1.8rem;font-variant-numeric:tabular-nums;margin-right:1rem}
+  .fila{display:flex;gap:1rem;flex-wrap:wrap;align-items:center}
+  pre{background:#f0f0f0;padding:.6rem;overflow:auto}
+  #aviso{color:#9f1d1d;font-weight:600}
+</style>
+</head>
+<body>
+<h1>Registro de sesión (lo usa el observador)</h1>
+<p>Úselo en un dispositivo distinto o en otra ventana que el participante no vea. No escriba nombres: solo el código.</p>
+<form id="sesion">
+  <div class="fila">
+    <label>Código <select name="participante"><option>P00</option><option>P01</option><option>P02</option></select></label>
+    <label>Versión evaluada <select name="version"><option>v1</option><option>v2</option></select></label>
+    <label>Fecha <input type="date" name="fecha" required></label>
+    <label>Dispositivo <input name="dispositivo" required placeholder="celular / portátil"></label>
+  </div>
+  <label><input type="checkbox" name="consentimiento" required> El consentimiento está firmado y la persona no desarrolló la aplicación.</label>
+  <div id="tareas"></div>
+  <fieldset>
+    <legend>SUS (lo responde el participante, 1 = muy en desacuerdo, 5 = muy de acuerdo)</legend>
+    <div id="sus"></div>
+  </fieldset>
+  <button type="submit">Generar filas CSV</button>
+  <button type="button" id="borrar">Borrar formulario</button>
+  <p id="aviso" role="alert"></p>
+</form>
+<section id="salida" hidden>
+  <h2>Copie estas filas al final de cada archivo</h2>
+  <h3>evaluacion/resultados/sesiones.csv</h3><pre id="csv-sesiones"></pre>
+  <h3>evaluacion/resultados/sus.csv</h3><pre id="csv-sus"></pre>
+  <p><button type="button" id="descargar">Descargar copia de respaldo (.txt)</button></p>
+</section>
+<script>
+const TAREAS = [
+  ['T1', 'Reservar una tutoría virtual de Bases de Datos'],
+  ['T2', 'Cambiar la fecha sin alterar lo demás'],
+  ['T3', 'Reservar IHC presencial, recuperarse del fallo y cancelar la de Bases de Datos'],
+];
+const SUS = [
+  'Creo que me gustaría usar este sistema con frecuencia.', 'Encontré el sistema innecesariamente complejo.',
+  'El sistema me pareció fácil de usar.', 'Creo que necesitaría apoyo técnico para usarlo.',
+  'Las funciones del sistema están bien integradas.', 'Había demasiada inconsistencia en el sistema.',
+  'Imagino que la mayoría aprendería a usarlo muy rápido.', 'El sistema me resultó muy engorroso de usar.',
+  'Me sentí con mucha confianza al usarlo.', 'Necesité aprender muchas cosas antes de poder usarlo.',
+];
+const $ = (s) => document.querySelector(s);
+const opciones = (n) => '<option value="">—</option>' + Array.from({length: n}, (_, i) => `<option>${i + 1}</option>`).join('');
+$('#tareas').innerHTML = TAREAS.map(([id, nombre]) => `
+  <fieldset><legend>${id}. ${nombre}</legend>
+    <div class="fila"><span class="reloj" id="reloj-${id}">0 s</span><button type="button" data-reloj="${id}">Iniciar</button>
+    <label>Tiempo (s) <input name="${id}-tiempo" type="number" min="1" required></label></div>
+    <div class="fila">
+      <label>Éxito <select name="${id}-exito" required><option value="">—</option><option value="si">Sí, sin ayuda y cumple el criterio</option><option value="parcial">Parcial (con ayuda o criterio incompleto)</option><option value="no">No</option></select></label>
+      <label>Errores <input name="${id}-errores" type="number" min="0" required></label>
+      <label>Ayudas <input name="${id}-ayudas" type="number" min="0" required></label>
+      <label>SEQ (1 muy difícil, 7 muy fácil) <select name="${id}-seq" required>${opciones(7)}</select></label>
+    </div>
+    <label>Observaciones, citas y dónde se trabó <textarea name="${id}-obs" rows="3"></textarea></label>
+  </fieldset>`).join('');
+$('#sus').innerHTML = SUS.map((t, i) => `<label>${i + 1}. ${t} <select name="q${i + 1}">${opciones(5)}</select></label>`).join('');
+
+const relojes = {};
+document.addEventListener('click', (e) => {
+  const id = e.target.dataset.reloj;
+  if (!id) return;
+  if (relojes[id]) {
+    clearInterval(relojes[id].intervalo);
+    const s = Math.max(1, Math.round((Date.now() - relojes[id].inicio) / 1000));
+    $(`[name="${id}-tiempo"]`).value = s;
+    delete relojes[id];
+    e.target.textContent = 'Reiniciar';
+    guardar();
+  } else {
+    const inicio = Date.now();
+    relojes[id] = { inicio, intervalo: setInterval(() => { $(`#reloj-${id}`).textContent = `${Math.round((Date.now() - inicio) / 1000)} s`; }, 250) };
+    e.target.textContent = 'Detener';
+  }
+});
+
+const CLAVE = 'tutorias.registro-sesion';
+const campos = () => [...$('#sesion').elements].filter((c) => c.name);
+function guardar() {
+  try { localStorage.setItem(CLAVE, JSON.stringify(Object.fromEntries(campos().map((c) => [c.name, c.type === 'checkbox' ? c.checked : c.value])))); } catch {}
+}
+try {
+  const previo = JSON.parse(localStorage.getItem(CLAVE)) || {};
+  campos().forEach((c) => { if (c.name in previo) c[c.type === 'checkbox' ? 'checked' : 'value'] = previo[c.name]; });
+} catch {}
+$('#sesion').addEventListener('input', guardar);
+$('#borrar').addEventListener('click', () => {
+  if (!confirm('¿Borrar todos los datos de este formulario?')) return;
+  try { localStorage.removeItem(CLAVE); } catch {}
+  location.reload();
+});
+
+const celda = (v) => (/[",\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v);
+$('#sesion').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const d = Object.fromEntries(new FormData(e.target));
+  const sus = SUS.map((_, i) => d[`q${i + 1}`]);
+  const respondidas = sus.filter(Boolean).length;
+  if (respondidas > 0 && respondidas < 10) { $('#aviso').textContent = 'Complete las 10 preguntas del SUS o deje las 10 vacías.'; return; }
+  $('#aviso').textContent = '';
+  $('#csv-sesiones').textContent = TAREAS.map(([id]) => [d.participante, d.version, d.fecha, d.dispositivo, id,
+    d[`${id}-tiempo`], d[`${id}-exito`], d[`${id}-errores`], d[`${id}-ayudas`], d[`${id}-seq`], d[`${id}-obs`].replace(/\n/g, ' ')]
+    .map(celda).join(',')).join('\n');
+  $('#csv-sus').textContent = respondidas ? [d.participante, d.version, ...sus].join(',') : '(SUS no aplicado)';
+  $('#salida').hidden = false;
+  $('#salida').scrollIntoView();
+});
+$('#descargar').addEventListener('click', () => {
+  const texto = `sesiones.csv\n${$('#csv-sesiones').textContent}\n\nsus.csv\n${$('#csv-sus').textContent}\n`;
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([texto], { type: 'text/plain' }));
+  a.download = `sesion-${$('[name=participante]').value}-${$('[name=version]').value}.txt`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+</script>
+</body>
+</html>
